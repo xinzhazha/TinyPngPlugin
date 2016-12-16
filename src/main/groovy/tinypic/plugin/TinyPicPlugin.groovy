@@ -11,6 +11,7 @@
 
 package tinypic.plugin
 
+import com.android.build.OutputFile
 import com.android.build.gradle.AppPlugin
 import com.tinify.*
 import org.gradle.api.Plugin
@@ -34,176 +35,160 @@ class TinyPicPlugin implements Plugin<Project> {
         project.afterEvaluate {
             variants.all { variant ->
 
-
-                if (tinyinfo.skip == true) {
+                if (tinyinfo.skip) {
                     printlog "skip tinyPicPlugin Task!!!!!!"
-
                     return
                 }
 
                 def processResourceTask = project.tasks.findByName("process${variant.name.capitalize()}Resources")
-                def tinyPicPlugin = "tinyPicPlugin${variant.name.capitalize()}"
-                project.task(tinyPicPlugin) << {
+                if (processResourceTask == null) {
+                    variant.outputs.each { output ->
+                        def abi = output.getFilter(OutputFile.ABI)
+                        processResourceTask = project.tasks.findByName("process${abi.capitalize()}${variant.name.capitalize()}Resources")
+                        if (processResourceTask != null) {
+                            def tinyPicPlugin = "tinyPicPlugin${variant.name.capitalize()}"
+                            project.task(tinyPicPlugin) << {
 
-                    def apiKey = tinyinfo.apiKey
-                    printlog "tiny apiKey:" + apiKey
+                                def apiKey = tinyinfo.apiKey
+                                printlog "tiny apiKey:" + apiKey
 
-//                    def maxNum = tinyinfo.maxNum
-
-//                    println "tiny maxNum:" + maxNum
-//                    if (maxNum == null) {
-//                        println "maxNum==null"
-//                    }
-                    try {
-                        Tinify.setKey("${apiKey}");
-                        Tinify.validate();
-                    } catch (java.lang.Exception e) {
-                        // Validation of API key failed.
-                        throw new Exception("Tiny Validation of API key failed.")
-                    }
-
-                    def n = 0
-                    def thisTimeTotalSaveSize = 0
-                    def lastAllTimesTotalSaveSize = 0
-                    def compressedListFile = new File("${project.projectDir}/tinypic_compressed_list.txt")
-                    if (!compressedListFile.exists()) {
-                        compressedListFile.createNewFile()
-                    }
-                    def whiteListFile = new File("${project.projectDir}/tinypic_white_list.txt")
-                    if (!whiteListFile.exists()) {
-                        whiteListFile.createNewFile()
-                    }
-                    def ln = System.getProperty('line.separator')
-
-                    def compressedList = new ArrayList()
-                    compressedListFile.eachLine() {
-                        compressedList.add(it)
-                        printlog "compressedList line:" + it
-
-                    }
-
-
-
-                    String resPath = "${project.projectDir}/src/main/res/"
-                    def dir = new File("${resPath}")
-                    dir.eachDirMatch(~/drawable[a-z-]*/) { drawDir ->
-                        def file = new File("${drawDir}")
-                        file.eachFile { filePathAndName ->
-                            def fileName = filePathAndName.name
-
-                            def isInWhiteList = false
-                            def isInCompressedList = false
-                            whiteListFile.eachLine { whiteName ->
-                                if (fileName.equals(whiteName)) {
-                                    isInWhiteList = true
-                                }
-                            }
-
-                            compressedList.each {
-                                if (fileName.equals(it)) {
-                                    isInCompressedList = true
-                                }
-                                String str = it.toString()
-                                if (str.contains("all times totalSaveSize")) {
-                                    lastAllTimesTotalSaveSize = it.toString().subSequence(str.indexOf(":") + 1, str.indexOf("B"))
+                                try {
+                                    Tinify.setKey("${apiKey}");
+                                    Tinify.validate();
+                                } catch (Exception ignored) {
+                                    // Validation of API key failed.
+                                    throw new Exception("Tiny Validation of API key failed.")
                                 }
 
-                            }
+                                def n = 0
+                                def thisTimeTotalSaveSize = 0
+                                def lastAllTimesTotalSaveSize = 0
+                                def compressedListFile = new File("${project.projectDir}/tinypic_compressed_list.txt")
+                                if (!compressedListFile.exists()) {
+                                    compressedListFile.createNewFile()
+                                }
+                                def whiteListFile = new File("${project.projectDir}/tinypic_white_list.txt")
+                                if (!whiteListFile.exists()) {
+                                    whiteListFile.createNewFile()
+                                }
+                                def ln = System.getProperty('line.separator')
 
+                                def compressedList = new ArrayList()
+                                compressedListFile.eachLine() {
+                                    compressedList.add(it)
+                                    printlog "compressedList line:" + it
 
-                            if (!isInWhiteList && !isInCompressedList) {
-                                if (fileName.endsWith(".jpg") || fileName.endsWith(".png")) {
-                                    if (!fileName.contains(".9")) {
-//                                        if (maxNum != null) {
-//                                            if (n < maxNum) {
-//                                                n++
-//                                            } else {
-//                                                return
-//                                            }
-//                                        }
+                                }
 
-                                        printlog "find target pic >>>>>>>>>>>>>" + fileName
+                                String resPath = "${project.projectDir}/src/main/res/"
+                                def dir = new File("${resPath}")
+                                dir.eachDirMatch(~/drawable[a-z-]*/) { drawDir ->
+                                    def file = new File("${drawDir}")
+                                    file.eachFile { filePathAndName ->
+                                        def fileName = filePathAndName.name
 
-
-
-
-                                        def picName = fileName.split('\\.')[0]
-                                        def suffix = fileName.split('\\.')[1]
-                                        printlog "picName:" + picName
-
-                                        def targetFile = new File("${filePathAndName}")
-                                        def fis = new FileInputStream(targetFile);
-
-                                        try {
-                                            def beforeSize = fis.available();
-                                            printlog "beforeSize:" + beforeSize + "B"
-
-                                            // Use the Tinify API client
-                                            def tSource = Tinify.fromFile("${filePathAndName}");
-                                            tSource.toFile("${filePathAndName}");
-
-                                            def afterSize = fis.available();
-                                            printlog "afterSize:" + afterSize + "B"
-
-
-                                            def saveSize = beforeSize - afterSize
-                                            printlog("saveSize:" + saveSize + "B")
-
-                                            thisTimeTotalSaveSize += saveSize
-
-                                            compressedListFile << "${fileName}${ln}"
-
-                                        } catch (AccountException e) {
-                                            System.out.println("The error message is: " + e.getMessage());
-                                            // Verify your API key and account limit.
-                                        } catch (ClientException e) {
-                                            // Check your source image and request options.
-
-                                            System.out.println("The error message is: " + e.getMessage());
-                                        } catch (ServerException e) {
-                                            // Temporary issue with the Tinify API.
-                                            System.out.println("The error message is: " + e.getMessage());
-                                        } catch (ConnectionException e) {
-                                            // A network connection error occurred.
-                                            System.out.println("The error message is: " + e.getMessage());
-                                        } catch (java.lang.Exception e) {
-                                            // Something else went wrong, unrelated to the Tinify API.
-                                            System.out.println("The error message is: " + e.getMessage());
+                                        def isInWhiteList = false
+                                        def isInCompressedList = false
+                                        whiteListFile.eachLine { whiteName ->
+                                            if (fileName.equals(whiteName)) {
+                                                isInWhiteList = true
+                                            }
                                         }
 
+                                        compressedList.each {
+                                            if (fileName.equals(it)) {
+                                                isInCompressedList = true
+                                            }
+                                            String str = it.toString()
+                                            if (str.contains("all times totalSaveSize")) {
+                                                lastAllTimesTotalSaveSize = it.toString().subSequence(str.indexOf(":") + 1, str.indexOf("B"))
+                                            }
+                                        }
+
+                                        if (!isInWhiteList && !isInCompressedList) {
+                                            if (fileName.endsWith(".jpg") || fileName.endsWith(".png")) {
+                                                if (!fileName.contains(".9")) {
+                                                    printlog "find target pic >>>>>>>>>>>>>" + fileName
+
+                                                    def picName = fileName.split('\\.')[0]
+                                                    def suffix = fileName.split('\\.')[1]
+                                                    printlog "picName:" + picName
+
+                                                    def targetFile = new File("${filePathAndName}")
+                                                    def fis = new FileInputStream(targetFile);
+
+                                                    try {
+                                                        def beforeSize = fis.available();
+                                                        printlog "beforeSize:" + beforeSize + "B"
+
+                                                        // Use the Tinify API client
+                                                        def tSource = Tinify.fromFile("${filePathAndName}");
+                                                        tSource.toFile("${filePathAndName}");
+
+                                                        def afterSize = fis.available();
+                                                        printlog "afterSize:" + afterSize + "B"
+
+
+                                                        def saveSize = beforeSize - afterSize
+                                                        printlog("saveSize:" + saveSize + "B")
+
+                                                        thisTimeTotalSaveSize += saveSize
+
+                                                        compressedListFile << "${fileName}${ln}"
+
+                                                    } catch (AccountException e) {
+                                                        System.out.println("The error message is: " + e.getMessage());
+                                                        // Verify your API key and account limit.
+                                                    } catch (ClientException e) {
+                                                        // Check your source image and request options.
+
+                                                        System.out.println("The error message is: " + e.getMessage());
+                                                    } catch (ServerException e) {
+                                                        // Temporary issue with the Tinify API.
+                                                        System.out.println("The error message is: " + e.getMessage());
+                                                    } catch (ConnectionException e) {
+                                                        // A network connection error occurred.
+                                                        System.out.println("The error message is: " + e.getMessage());
+                                                    } catch (java.lang.Exception e) {
+                                                        // Something else went wrong, unrelated to the Tinify API.
+                                                        System.out.println("The error message is: " + e.getMessage());
+                                                    }
+
+                                                }
+                                            }
+                                        }
                                     }
                                 }
+
+                                if (thisTimeTotalSaveSize.toInteger() == 0) {
+                                    printlog "no need save"
+
+                                    return
+                                }
+                                def allTimesTotalSaveSize = thisTimeTotalSaveSize.toInteger() + lastAllTimesTotalSaveSize.toInteger()
+                                printlog "totalSaveSize>>>>>>>>>>>>>>>>>>>>>>" + thisTimeTotalSaveSize + "B"
+
+                                compressedListFile << ">>>>>>>>>lastAllTimesTotalSaveSize>>>>>>>>>>:${lastAllTimesTotalSaveSize}" + "B" + " ${ln}"
+                                compressedListFile << ">>>>>>>>>>>>>>this time totalSaveSize>>>>>>>>>>>>>>>:${thisTimeTotalSaveSize}" + "B" + " ${ln}"
+                                compressedListFile << ">>>>>>>>>>>>>>>>>>>all times totalSaveSize>>>>>>>>>>>>>>>>>>>>:${allTimesTotalSaveSize}" + "B" + " ${ln}"
+
+
                             }
 
+                            //将自定义task放在dx task之前执行
+                            project.tasks.findByName(tinyPicPlugin).dependsOn processResourceTask.taskDependencies.getDependencies(processResourceTask)
+                            processResourceTask.dependsOn project.tasks.findByName(tinyPicPlugin)
                         }
                     }
-
-                    if (thisTimeTotalSaveSize.toInteger() == 0) {
-                        printlog "no need save"
-
-                        return
-                    }
-                    def allTimesTotalSaveSize = thisTimeTotalSaveSize.toInteger() + lastAllTimesTotalSaveSize.toInteger()
-                    printlog "totalSaveSize>>>>>>>>>>>>>>>>>>>>>>" + thisTimeTotalSaveSize + "B"
-
-                    compressedListFile << ">>>>>>>>>lastAllTimesTotalSaveSize>>>>>>>>>>:${lastAllTimesTotalSaveSize}" + "B" + " ${ln}"
-                    compressedListFile << ">>>>>>>>>>>>>>this time totalSaveSize>>>>>>>>>>>>>>>:${thisTimeTotalSaveSize}" + "B" + " ${ln}"
-                    compressedListFile << ">>>>>>>>>>>>>>>>>>>all times totalSaveSize>>>>>>>>>>>>>>>>>>>>:${allTimesTotalSaveSize}" + "B" + " ${ln}"
-
-
                 }
 
-                //将自定义task放在dx task之前执行
-                project.tasks.findByName(tinyPicPlugin).dependsOn processResourceTask.taskDependencies.getDependencies(processResourceTask)
-                processResourceTask.dependsOn project.tasks.findByName(tinyPicPlugin)
             }
-
         }
 
     }
 
     void printlog(String msg) {
-        if (tinyinfo.isShowLog == true) {
+        if (tinyinfo.isShowLog) {
             println msg
         }
     }
@@ -213,7 +198,6 @@ class TinyPicPlugin implements Plugin<Project> {
 class TinyInfo {
     String apiKey
     String maxNum
-
 
     boolean skip
     boolean isShowLog
