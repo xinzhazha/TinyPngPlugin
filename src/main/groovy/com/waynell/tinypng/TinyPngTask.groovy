@@ -161,7 +161,9 @@ public class TinyPngTask extends DefaultTask {
 
         if(newCompressedList) {
             compressedList.addAll(newCompressedList)
-            compressedListFile.write(new JsonOutput().toJson(compressedList), "utf-8")
+            def jsonOutput = new JsonOutput()
+            def json = jsonOutput.toJson(compressedList)
+            compressedListFile.write(jsonOutput.prettyPrint(json), "utf-8")
         }
 
     }
