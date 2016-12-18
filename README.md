@@ -49,7 +49,7 @@ tinyAPI will give every key 500 free limited to compressed pic success.
 
 tinyPIC have a tinypic_compressed_list.txt file to record the pic we successed compressed,
 next time tinyPIC will pass the pic to save your amount.
-tinyPIC also have a tinypic_white_list.txt file,if the pic doesn't look good after tiny ,you can revert it and add it's name in the file ,
+tinyPIC also have a tinypic_white_list.txt file,if the pic doesn't look good after tiny ,you can revert it and add it's path in the file ,
 so next time tinyPIC will ignore it.
 OK,have a try and have fun!!!
 

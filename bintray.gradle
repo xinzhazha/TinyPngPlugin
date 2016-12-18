@@ -1,9 +1,10 @@
+apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-def siteUrl = 'https://github.com/mogujie'      // 项目的主页
-def gitUrl = 'https://github.com/mogujie'   // Git仓库的url
-group = "com.mogujie.gradle"  // Maven Group ID for the artifact，一般填你唯一的包名
-version = "1.1.4"
+def siteUrl = 'https://github.com/waynell'      // 项目的主页
+def gitUrl = 'https://github.com/waynell'   // Git仓库的url
+group = "com.waynell.tintpng"  // Maven Group ID for the artifact，一般填你唯一的包名
+version = "1.1.5"
 
 install {
     repositories.mavenInstaller {
@@ -12,7 +13,7 @@ install {
             project {
                 packaging 'jar'
                 // Add your description here
-                name 'TinyPIC plugin' 	//项目描述
+                name 'Android TinyPng Plugin' 	//项目描述
                 url siteUrl
                 // Set your license
                 licenses {
@@ -23,9 +24,9 @@ install {
                 }
                 developers {
                     developer {
-                        id 'boyue'		//填写的一些基本信息
-                        name 'boyue'
-                        email 'daydayupon360@gmail.com'
+                        id 'waynell'		//填写的一些基本信息
+                        name 'Wayne Yang'
+                        email 'ywj2167917@gmail.com'
                     }
                 }
                 scm {
@@ -62,7 +63,7 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = "maven"
-        name = "TinyPIC_Gradle_Plugin"	//发布到JCenter上的项目名字
+        name = "TinyPngPlugin"	//发布到JCenter上的项目名字
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["MIT"]
