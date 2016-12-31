@@ -7,8 +7,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
 import java.lang.Exception
+import java.security.MessageDigest
 import java.text.DecimalFormat
-
 /**
  * TingPng Task
  * @author Wayne
@@ -43,6 +43,20 @@ public class TinyPngTask extends DefaultTask {
         }
     }
 
+    public static String generateMD5(File file) {
+        MessageDigest digest = MessageDigest.getInstance("MD5")
+        file.withInputStream(){ is ->
+            int read
+            byte[] buffer = new byte[8192]
+            while((read = is.read(buffer)) > 0) {
+                digest.update(buffer, 0, read);
+            }
+        }
+        byte[] md5sum = digest.digest()
+        BigInteger bigInt = new BigInteger(1, md5sum)
+        return bigInt.toString(16).padLeft(32, '0')
+    }
+
     public static List<TinyPngInfo> compress(File resDir, Iterable<String> whiteList, Iterable<TinyPngInfo> compressedList) {
         def newCompressedList = new ArrayList<TinyPngInfo>()
         label: for (File file : resDir.listFiles()) {
@@ -56,7 +70,7 @@ public class TinyPngTask extends DefaultTask {
             }
 
             for (TinyPngInfo info : compressedList) {
-                if (filePath == info.path && file.lastModified() == info.modifyTime) {
+                if (filePath == info.path && generateMD5(file) == info.md5) {
                     continue label
                 }
             }
@@ -66,7 +80,7 @@ public class TinyPngTask extends DefaultTask {
                     continue
                 }
 
-                println("find target pic >>>>>>>>>>>>>" + filePath)
+                println("find target pic >>>>>>>>>>>>> $filePath")
 
                 def fis = new FileInputStream(file)
 
@@ -83,7 +97,7 @@ public class TinyPngTask extends DefaultTask {
                     def afterSizeStr = formetFileSize(afterSize)
                     println("afterSize: ${afterSizeStr}")
 
-                    newCompressedList.add(new TinyPngInfo(filePath, beforeSizeStr, afterSizeStr, file.lastModified()))
+                    newCompressedList.add(new TinyPngInfo(filePath, beforeSizeStr, afterSizeStr, generateMD5(file)))
                 } catch (AccountException e) {
                     println("AccountException: ${e.getMessage()}")
                     // Verify your API key and account limit.
@@ -111,7 +125,7 @@ public class TinyPngTask extends DefaultTask {
     def run() {
         println(configuration.toString())
 
-        if (!(configuration.resourceList ?: false)) {
+        if (!(configuration.resourceDir ?: false)) {
             println("Not found resources list")
             return
         }
@@ -126,10 +140,11 @@ public class TinyPngTask extends DefaultTask {
             Tinify.validate()
         } catch (Exception ignored) {
             println("Tiny Validation of API key failed.")
+            ignored.printStackTrace()
             return
         }
 
-        def compressedList = []
+        def compressedList = new ArrayList<TinyPngInfo>()
         def compressedListFile = new File("${project.projectDir}/compressed-resource.json")
         if (!compressedListFile.exists()) {
             compressedListFile.createNewFile()
@@ -138,7 +153,7 @@ public class TinyPngTask extends DefaultTask {
             try {
                 def list = new JsonSlurper().parse(compressedListFile, "utf-8")
                 if(list instanceof ArrayList) {
-                    compressedList = list as ArrayList<TinyPngInfo>
+                    compressedList = list
                 }
                 else {
                     println("compressed-resource.json is invalid, ignore")
@@ -149,22 +164,33 @@ public class TinyPngTask extends DefaultTask {
         }
 
         def newCompressedList = new ArrayList<TinyPngInfo>()
-        configuration.resourceList.each {
-            def dir = new File(it)
-            dir.eachDirMatch(~/drawable[a-z-]*/) { drawDir ->
+        configuration.resourceDir.each { d ->
+            def dir = new File(d)
+            if(!(configuration.resourcePattern ?: false)) {
+                configuration.resourcePattern = ["drawable[a-z-]*"]
+            }
+            configuration.resourcePattern.each { p ->
+                dir.eachDirMatch(~/$p/) { drawDir ->
                 List<TinyPngInfo> list = compress(drawDir, configuration.whiteList, compressedList)
-                if(list) {
-                    newCompressedList.addAll(list)
+                    if(list) {
+                        newCompressedList.addAll(list)
+                    }
                 }
             }
         }
 
         if(newCompressedList) {
-            compressedList.addAll(newCompressedList)
+            for (TinyPngInfo newTinyPng : newCompressedList) {
+                def index = compressedList.path.indexOf(newTinyPng.path)
+                if (index >= 0) {
+                    compressedList[index] = newTinyPng
+                } else {
+                    compressedList.add(0, newTinyPng)
+                }
+            }
             def jsonOutput = new JsonOutput()
             def json = jsonOutput.toJson(compressedList)
             compressedListFile.write(jsonOutput.prettyPrint(json), "utf-8")
         }
-
     }
 }

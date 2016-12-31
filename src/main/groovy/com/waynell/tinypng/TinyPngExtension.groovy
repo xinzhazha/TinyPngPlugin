@@ -7,14 +7,16 @@ package com.waynell.tinypng
 public class TinyPngExtension {
     String apiKey
     boolean isShowLog
-    Iterable<String> whiteList;
-    Iterable<String> resourceList;
+    ArrayList<String> whiteList;
+    ArrayList<String> resourceDir;
+    ArrayList<String> resourcePattern;
 
     public TinyPngExtension() {
         apiKey = ""
         isShowLog = false
         whiteList = []
-        resourceList = []
+        resourceDir = []
+        resourcePattern = []
     }
 
     @Override
@@ -23,7 +25,8 @@ public class TinyPngExtension {
                 "apiKey='" + apiKey + '\'' +
                 ", isShowLog=" + isShowLog +
                 ", whiteList=" + whiteList +
-                ", resourceList=" + resourceList +
+                ", resourceDir=" + resourceDir +
+                ", resourcePattern=" + resourcePattern +
                 '}';
     }
 }
