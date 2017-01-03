@@ -12,7 +12,6 @@ public class TinyPngExtension {
 
     public TinyPngExtension() {
         apiKey = ""
-        isShowLog = false
         whiteList = []
         resourceDir = []
         resourcePattern = []
@@ -22,7 +21,6 @@ public class TinyPngExtension {
     public String toString() {
         return "TinyPngExtension{" +
                 "apiKey='" + apiKey + '\'' +
-                ", isShowLog=" + isShowLog +
                 ", whiteList=" + whiteList +
                 ", resourceDir=" + resourceDir +
                 ", resourcePattern=" + resourcePattern +

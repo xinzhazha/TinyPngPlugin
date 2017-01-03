@@ -12,7 +12,7 @@
 首先在根目录中的`build.gradle`文件中添加`TinyPngPlugin`的依赖：
 
  	dependencies {
-    	classpath 'com.waynell.tinypng:TinyPngPlugin:1.0.2'
+    	classpath 'com.waynell.tinypng:TinyPngPlugin:1.0.3'
 	}
 
 然后在app目录中的`build.gradle`文件中应用该插件，并配置`tinyinfo`：
@@ -22,8 +22,8 @@
  	tinyinfo {
     	resourceDir = [
 			// 你的资源目录
-            "app/src/main/res/",
-            "lib/src/main/res/"
+            "app/src/main/res",
+            "lib/src/main/res"
     	]
         resourcePattern = [
         	// 你的资源文件夹

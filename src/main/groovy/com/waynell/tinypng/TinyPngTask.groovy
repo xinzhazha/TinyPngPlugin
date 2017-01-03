@@ -66,6 +66,7 @@ public class TinyPngTask extends DefaultTask {
 
             for (String s : whiteList) {
                 if (fileName ==~/$s/) {
+                    println("match whit list, skip it >>>>>>>>>>>>> $filePath")
                     continue label
                 }
             }

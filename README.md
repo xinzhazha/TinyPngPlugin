@@ -12,7 +12,7 @@ Before use this plugin, you need get a Tiny API Key first. Goto [Tiny Developers
 Add `TinyPngPlugin` as a dependency in your main build.gradle in the root of your project:
 
  	dependencies {
-    	classpath 'com.waynell.tinypng:TinyPngPlugin:1.0.2'
+    	classpath 'com.waynell.tinypng:TinyPngPlugin:1.0.3'
 	}
 
 Then you need to apply the plugin and configure your `tinyinfo` by adding the following lines to your `app/build.gradle`:
@@ -22,8 +22,8 @@ Then you need to apply the plugin and configure your `tinyinfo` by adding the fo
  	tinyinfo {
     	resourceDir = [
 			// your res dir
-            "app/src/main/res/",
-            "lib/src/main/res/"
+            "app/src/main/res",
+            "lib/src/main/res"
     	]
         resourcePattern = [
         	// your res pattern
