@@ -1,77 +1,67 @@
-#  TinyPIC Gradle Plugin #
+*其它语言版本: [English](README.md),[简体中文](README.zh-cn.md).*
 
+### TinyPngPlugin
+`TinyPngPlugin`是一个[TinyPng](https://tinypng.com/)的Gradle插件，它能够批量地压缩你项目中的图片
 
-*其他语言版本: [English](README.md).*
+### 获得Tiny的API Key
+在使用该插件前， 你需要先获得一个Tiny的API Key。 首先跳转到[Tiny Developers Page](https://tinypng.com/developers)，然后输入你的姓名和邮箱来获得这个Key
 
-## 更新信息
-### 1.1.4
-    添加了新配置属性:
-    //是否跳过此task
-    skip = true/false 
-    //是否打印日志
-    isShowLog = true/false
+*注意: 一个Key每个月可以免费压缩500张图片，超过500张后就需要付费后才能继续使用*
 
-### 1.1.3.1
-    规范了目录结构，删除了冗余代码
-### 1.1.3
-    添加如果本次压缩是0B  就不输出信息到文件里面去
-### 1.1.2
-    添加总减少大小统计
+### 使用教程
+首先在根目录中的`build.gradle`文件中添加`TinyPngPlugin`的依赖：
 
-***
+ 	dependencies {
+    	classpath 'com.waynell.tinypng:TinyPngPlugin:1.0.2'
+	}
 
-各位亲们，你们还在手动添加一个个图片到tiny上压缩，下载吗？
+然后在app目录中的`build.gradle`文件中应用该插件，并配置`tinyinfo`：
 
-tinyPIC是一个批量tiny处理res图片的gradle插件，以后您尽管往res里放切好的图，tiny处理的工作就交给他好了。
+ 	apply plugin: 'com.waynell.tinypng'
 
-### tinyPIC插件的使用方法如下：
-***
-在外层的build.gradle文件中（即与settings.gradle同级的文件）添加如下代码
+ 	tinyinfo {
+    	resourceDir = [
+			// 你的资源目录
+            "app/src/main/res/",
+            "lib/src/main/res/"
+    	]
+        resourcePattern = [
+        	// 你的资源文件夹
+        	"drawable[a-z-]*",
+            "mipmap[a-z-]*"
+        ]
+        whiteList = [
+        	// 在这里添加文件白名单，支持正则表达式
+        ]
+        apiKey = 'your tiny API key'
+    }
 
- 	    classpath 'com.mogujie.gradle:tinyPicPlugin:1.1.4'
- 	
-在内层build.gradle文件中（即与src同级的文件）添加如下代码
+使用`Android Studio`的同学，可以在`tinypng`目录中找到相关的构建任务。或者也可以直接在终端中运行`./gradlew tinyPng`命令来执行任务
 
+`TinyPngPlugin`会将压缩结果保存到`compressed-resource.json`这个文件中，下次再运行任务时会自动跳过那些已经被压缩过的文件
 
+### 致谢
+[TinyPIC_Gradle_Plugin](https://github.com/mogujie/TinyPIC_Gradle_Plugin)
 
- 	    apply plugin: 'tinyPIC'
-    
-        tinyinfo {
-            apiKey = '你申请的tiny API key'
-            //是否跳过此task
-            skip = true/false 
-            //是否打印日志
-            isShowLog = true/false
-        }
+### Licence
+MIT License
 
+Copyright (c) 2016 Wayne Yang
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-### tiny API key申请的方法：
-***
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-进入	https://tinypng.com/developers 
-找个邮箱申请就可以了
-
-
-
-通过邮箱返回的链接，你就能进入你的账号的信息页了，
-左边是你的 API KEY 
-右边是你的账号每个月压缩图片的使用额度
-
-
-tinyAPI 每个月给每个账号500张的免费压缩额度，我在我的tinyPIC里添加了一个tinypic_compressed_list.txt 文件
-该文件记录了已经被我们成功压缩过的图片，如图：
-PastedGraphic-6.tiff
-
-这样在以后build的时候就不会再使用API额度对它进行处理了，对于每个业务组来说每月500完全够用了。不够用怎么办？再换个邮箱注册啊，亲
-
-
-tinyPIC还会生成一个tinypic_white_list.txt  它提供了白名单功能，如果发现经过tiny处理的图片UI效果不佳，可以通过添加文件名到此文件下进行忽略tiny压缩处理
-
-好了，快点从日常手动压缩业务图片中解脱出来吧
-
-
-
-## 协议
-***
-MGJTempStore 被许可在 MIT 协议下使用。查阅 LICENSE 文件来获得更多信息。
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

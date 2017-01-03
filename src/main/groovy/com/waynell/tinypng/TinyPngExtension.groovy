@@ -6,7 +6,6 @@ package com.waynell.tinypng
  */
 public class TinyPngExtension {
     String apiKey
-    boolean isShowLog
     ArrayList<String> whiteList;
     ArrayList<String> resourceDir;
     ArrayList<String> resourcePattern;

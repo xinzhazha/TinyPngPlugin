@@ -9,6 +9,7 @@ import org.gradle.api.tasks.TaskAction
 import java.lang.Exception
 import java.security.MessageDigest
 import java.text.DecimalFormat
+
 /**
  * TingPng Task
  * @author Wayne
@@ -64,7 +65,7 @@ public class TinyPngTask extends DefaultTask {
             def fileName = file.name
 
             for (String s : whiteList) {
-                if (fileName == s) {
+                if (fileName ==~/$s/) {
                     continue label
                 }
             }

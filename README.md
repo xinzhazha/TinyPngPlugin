@@ -1,60 +1,67 @@
-#  TinyPIC Gradle Plugin #
+*Read this in other languages: [English](README.md),[简体中文](README.zh-cn.md).*
 
+### TinyPngPlugin
+`TinyPngPlugin` is a Gradle plugin for [TinyPng](https://tinypng.com/), can batch optimize your images.
 
-*Read this in other languages: [简体中文](README.zh-cn.md).*
+### Get Tiny API key
+Before use this plugin, you need get a Tiny API Key first. Goto [Tiny Developers Page](https://tinypng.com/developers), input your email and name to get the key.
 
-## UpdateInfo
-### 1.1.4
-    add two new properties:
-    //if skpi the task
-    skip = true/false 
-    //if print log 
-    isShowLog = true/false
-### 1.1.3.1
-    rename packagename ,delete redundant code
-### 1.1.3
-    add new logic: if the save size is 0B,won't print message into tiny_compressed_list.txt
-### 1.1.2
-    add new statistics: all times total save size
+*Notice: The first 500 compressions each month are free. You will only be billed if you compress more than 500 images.*
 
-***
+### Getting Started
+Add `TinyPngPlugin` as a dependency in your main build.gradle in the root of your project:
 
-Dear,Do you still tiny your pic manually?
-tinyPIC is a gradle plugin which can tiny batch pics auto in your res directory. 
-### Usage of tinyPIC:
-***
+ 	dependencies {
+    	classpath 'com.waynell.tinypng:TinyPngPlugin:1.0.2'
+	}
 
-add below code in the outer build.gradle file(which is in the same directory of settings.gradle)
+Then you need to apply the plugin and configure your `tinyinfo` by adding the following lines to your `app/build.gradle`:
 
-    classpath 'com.mogujie.gradle:tinyPicPlugin:1.1.4'
-    
-add below code in the inner build.gradle file(which is in the same directory of src)
-
- 	apply plugin: 'tinyPIC'
+ 	apply plugin: 'com.waynell.tinypng'
 
  	tinyinfo {
-                apiKey = 'your tiny API key'
-                //if skpi the task
-                skip = true/false 
-                //if print log 
-                isShowLog = true/false
+    	resourceDir = [
+			// your res dir
+            "app/src/main/res/",
+            "lib/src/main/res/"
+    	]
+        resourcePattern = [
+        	// your res pattern
+        	"drawable[a-z-]*",
+            "mipmap[a-z-]*"
+        ]
+        whiteList = [
+        	// your white list, support Regular Expressions
+        ]
+        apiKey = 'your tiny API key'
     }
- 	
-### Get tiny API key
-***
 
-browse 	https://tinypng.com/developers  and provide an email
-Tiny will give you an email with a link ,open the link you will see your API KEY on the left ,and the amount of you this month
-tinyAPI will give every key 500 free limited to compressed pic success.
+If you are using `Android Studio`, you can find the generate task option in `tinypng` group. Or alternatively, you run `./gradlew tinyPng` in your terminal.
 
-tinyPIC have a tinypic_compressed_list.txt file to record the pic we successed compressed,
-next time tinyPIC will pass the pic to save your amount.
-tinyPIC also have a tinypic_white_list.txt file,if the pic doesn't look good after tiny ,you can revert it and add it's path in the file ,
-so next time tinyPIC will ignore it.
-OK,have a try and have fun!!!
+`TinyPngPlugin` has a `compressed-resource.json` file to record the compressed result, next time `TinyPngPlugin` will skip these files that have been compressed.
 
+### Thanks
+[TinyPIC_Gradle_Plugin](https://github.com/mogujie/TinyPIC_Gradle_Plugin)
 
+### Licence
+MIT License
 
-## Licence
-***
-TinyPIC is licensed under the MIT license
+Copyright (c) 2016 Wayne Yang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
