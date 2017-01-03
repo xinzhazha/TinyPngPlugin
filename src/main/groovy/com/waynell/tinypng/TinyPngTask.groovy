@@ -168,14 +168,16 @@ public class TinyPngTask extends DefaultTask {
         def newCompressedList = new ArrayList<TinyPngInfo>()
         configuration.resourceDir.each { d ->
             def dir = new File(d)
-            if(!(configuration.resourcePattern ?: false)) {
-                configuration.resourcePattern = ["drawable[a-z-]*"]
-            }
-            configuration.resourcePattern.each { p ->
-                dir.eachDirMatch(~/$p/) { drawDir ->
-                List<TinyPngInfo> list = compress(drawDir, configuration.whiteList, compressedList)
-                    if(list) {
-                        newCompressedList.addAll(list)
+            if(dir.exists() && dir.isDirectory()) {
+                if (!(configuration.resourcePattern ?: false)) {
+                    configuration.resourcePattern = ["drawable[a-z-]*"]
+                }
+                configuration.resourcePattern.each { p ->
+                    dir.eachDirMatch(~/$p/) { drawDir ->
+                        List<TinyPngInfo> list = compress(drawDir, configuration.whiteList, compressedList)
+                        if (list) {
+                            newCompressedList.addAll(list)
+                        }
                     }
                 }
             }
