@@ -32,6 +32,7 @@ gradlew
 gradlew.bat
 gradle.properties
 binlocal.gradle
+bintray.gradle
 
 # build
 lint.xml

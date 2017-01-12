@@ -1,6 +1,6 @@
 *其它语言版本: [English](README.md),[简体中文](README.zh-cn.md).*
 
-[![Build Status](https://semaphoreapp.com/api/v1/projects/d4cca506-99be-44d2-b19e-176f36ec8cf1/128505/shields_badge.svg)](https://github.com/waynell/TinyPngPlugin) [ ![Download](https://api.bintray.com/packages/waynell/maven/TinyPngPlugin/images/download.svg?version=1.0.4) ](https://bintray.com/waynell/maven/TinyPngPlugin/1.0.4/link)
+[![Build Status](https://semaphoreapp.com/api/v1/projects/d4cca506-99be-44d2-b19e-176f36ec8cf1/128505/shields_badge.svg)](https://github.com/waynell/TinyPngPlugin) [ ![Download](https://api.bintray.com/packages/waynell/maven/TinyPngPlugin/images/download.svg?version=1.0.5) ](https://bintray.com/waynell/maven/TinyPngPlugin/1.0.5/link)
 
 ### TinyPngPlugin
 `TinyPngPlugin`是一个[TinyPng](https://tinypng.com/)的Gradle插件，它能够批量地压缩你项目中的图片
@@ -14,7 +14,7 @@
 首先在根目录中的`build.gradle`文件中添加`TinyPngPlugin`的依赖：
 
  	dependencies {
-    	classpath 'com.waynell.tinypng:TinyPngPlugin:1.0.4'
+    	classpath 'com.waynell.tinypng:TinyPngPlugin:1.0.5'
 	}
 
 然后在app目录中的`build.gradle`文件中应用该插件，并配置`tinyinfo`：

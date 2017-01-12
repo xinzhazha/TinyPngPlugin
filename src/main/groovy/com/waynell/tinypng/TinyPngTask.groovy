@@ -58,8 +58,11 @@ public class TinyPngTask extends DefaultTask {
         return bigInt.toString(16).padLeft(32, '0')
     }
 
-    public static List<TinyPngInfo> compress(File resDir, Iterable<String> whiteList, Iterable<TinyPngInfo> compressedList) {
+    public static TinyPngResult compress(File resDir, Iterable<String> whiteList, Iterable<TinyPngInfo> compressedList) {
         def newCompressedList = new ArrayList<TinyPngInfo>()
+        def accountError = false
+        def beforeTotalSize = 0
+        def afterTotalSize = 0
         label: for (File file : resDir.listFiles()) {
             def filePath = file.path
             def fileName = file.name
@@ -89,7 +92,6 @@ public class TinyPngTask extends DefaultTask {
                 try {
                     def beforeSize = fis.available()
                     def beforeSizeStr = formetFileSize(beforeSize)
-                    println("beforeSize: $beforeSizeStr")
 
                     // Use the Tinify API client
                     def tSource = Tinify.fromFile("${resDir}/${fileName}")
@@ -97,11 +99,16 @@ public class TinyPngTask extends DefaultTask {
 
                     def afterSize = fis.available()
                     def afterSizeStr = formetFileSize(afterSize)
-                    println("afterSize: ${afterSizeStr}")
 
+                    beforeTotalSize += beforeSize
+                    afterTotalSize += afterSize
                     newCompressedList.add(new TinyPngInfo(filePath, beforeSizeStr, afterSizeStr, generateMD5(file)))
+
+                    println("beforeSize: $beforeSizeStr -> afterSize: ${afterSizeStr}")
                 } catch (AccountException e) {
                     println("AccountException: ${e.getMessage()}")
+                    accountError = true
+                    break
                     // Verify your API key and account limit.
                 } catch (ClientException e) {
                     // Check your source image and request options.
@@ -120,7 +127,7 @@ public class TinyPngTask extends DefaultTask {
                 }
             }
         }
-        return newCompressedList
+        return new TinyPngResult(beforeTotalSize, afterTotalSize, accountError, newCompressedList)
     }
 
     @TaskAction
@@ -165,6 +172,9 @@ public class TinyPngTask extends DefaultTask {
             }
         }
 
+        def beforeSize = 0L
+        def afterSize = 0L
+        def error = false
         def newCompressedList = new ArrayList<TinyPngInfo>()
         configuration.resourceDir.each { d ->
             def dir = new File(d)
@@ -174,9 +184,14 @@ public class TinyPngTask extends DefaultTask {
                 }
                 configuration.resourcePattern.each { p ->
                     dir.eachDirMatch(~/$p/) { drawDir ->
-                        List<TinyPngInfo> list = compress(drawDir, configuration.whiteList, compressedList)
-                        if (list) {
-                            newCompressedList.addAll(list)
+                        if(!error) {
+                            TinyPngResult result = compress(drawDir, configuration.whiteList, compressedList)
+                            beforeSize += result.beforeSize
+                            afterSize += result.afterSize
+                            error = result.error
+                            if (result.getResults()) {
+                                newCompressedList.addAll(result.getResults())
+                            }
                         }
                     }
                 }
@@ -195,6 +210,7 @@ public class TinyPngTask extends DefaultTask {
             def jsonOutput = new JsonOutput()
             def json = jsonOutput.toJson(compressedList)
             compressedListFile.write(jsonOutput.prettyPrint(json), "utf-8")
+            println("Task finish, compress ${newCompressedList.size()} files, before total size: ${formetFileSize(beforeSize)} after total size: ${formetFileSize(afterSize)}")
         }
     }
 }
