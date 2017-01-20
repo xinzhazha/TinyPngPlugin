@@ -21,7 +21,7 @@ Then you need to apply the plugin and configure your `tinyinfo` by adding the fo
 
  	apply plugin: 'com.waynell.tinypng'
 
- 	tinyinfo {
+ 	tinyInfo {
     	resourceDir = [
 			// your res dir
             "app/src/main/res",
