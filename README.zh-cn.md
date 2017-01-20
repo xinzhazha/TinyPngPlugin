@@ -21,7 +21,7 @@
 
  	apply plugin: 'com.waynell.tinypng'
 
- 	tinyinfo {
+ 	tinyInfo {
     	resourceDir = [
 			// 你的资源目录
             "app/src/main/res",
