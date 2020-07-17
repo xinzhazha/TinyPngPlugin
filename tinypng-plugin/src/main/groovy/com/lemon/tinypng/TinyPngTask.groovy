@@ -60,13 +60,13 @@ public class TinyPngTask extends DefaultTask {
         return bigInt.toString(16).padLeft(32, '0')
     }
 
-    public static TinyPngResult compress(File rootProjectDir, File resDir, Iterable<String> whiteList, Iterable<TinyPngInfo> compressedList) {
+    public static TinyPngResult compress(File resDir, Iterable<String> whiteList, Iterable<TinyPngInfo> compressedList) {
         def newCompressedList = new ArrayList<TinyPngInfo>()
         def accountError = false
         def beforeTotalSize = 0
         def afterTotalSize = 0
         label: for (File file : resDir.listFiles()) {
-            def filePath = file.relativePath(rootProjectDir)
+            def filePath = file.path
             def fileName = file.name
 
             for (String s : whiteList) {
@@ -104,7 +104,7 @@ public class TinyPngTask extends DefaultTask {
 
                     beforeTotalSize += beforeSize
                     afterTotalSize += afterSize
-                    newCompressedList.add(new TinyPngInfo(new File(filePath).relativePath(rootProjectDir), beforeSizeStr, afterSizeStr, generateMD5(file)))
+                    newCompressedList.add(new TinyPngInfo(filePath, beforeSizeStr, afterSizeStr, generateMD5(file)))
 
                     println("beforeSize: $beforeSizeStr -> afterSize: ${afterSizeStr}")
                 } catch (AccountException e) {
@@ -187,7 +187,7 @@ public class TinyPngTask extends DefaultTask {
                 configuration.resourcePattern.each { p ->
                     dir.eachDirMatch(~/$p/) { drawDir ->
                         if(!error) {
-                            TinyPngResult result = compress(project.rootProject.projectDir, drawDir, configuration.whiteList, compressedList)
+                            TinyPngResult result = compress(drawDir, configuration.whiteList, compressedList)
                             beforeSize += result.beforeSize
                             afterSize += result.afterSize
                             error = result.error

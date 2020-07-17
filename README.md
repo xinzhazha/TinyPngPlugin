@@ -12,7 +12,7 @@
 首先在根目录中的`build.gradle`文件中添加`TinyPngPlugin`的依赖：
 
  	dependencies {
-    	classpath 'com.lemon.compress:tinypng-plugin:1.0.3'
+    	classpath 'com.lemon.compress:tinypng-plugin:1.0.4'
 	}
 
 然后在app目录中的`build.gradle`文件中应用该插件，并配置`tinyinfo`：
@@ -39,8 +39,6 @@
 使用`Android Studio`的同学，可以在`tinypng`目录中找到相关的构建任务。或者也可以直接在终端中运行`./gradlew tinyPng`命令来执行任务
 
 `TinyPngPlugin`会将压缩结果保存到`compressed-resource.json`这个文件中，下次再运行任务时会自动跳过那些已经被压缩过的文件
-
-NOTE: 相比原项目主要修复了 compressed-resource.json 中的路径问题，解决了被重复压缩问题。
 
 ### 致谢
 [TinyPngPlugin](https://github.com/waynell/TinyPngPlugin)
