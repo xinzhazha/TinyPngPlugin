@@ -1,0 +1,40 @@
+group 'com.lemon.compress'
+version '1.0.3'
+
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+apply plugin: "maven"
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile localGroovy()
+    compile gradleApi()
+    compile 'com.tinify:tinify:1.6.2'
+}
+
+ext {
+    publishedGroupId = group
+    libraryVersion = version
+    // 这里声明没有用，artifactId 是 project.name
+//    artifactId = 'tinypng-plugin'
+
+    bintrayRepo = 'maven'
+    bintrayName = 'tinypng-plugin' //bintray上的项目名
+
+    siteUrl = 'https://github.com/xinzhazha/TinyPngPlugin'
+    gitUrl = 'https://github.com/xinzhazha/TinyPngPlugin.git'
+
+    libraryDescription = 'a gradle plugin from compress image though tinypng tech' //项目描述
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+// install 在 高版本 gradle sdk 中有了
+//apply from: 'https://raw.githubusercontent.com/llxdaxia/GradleScript/master/install_v1.gradle'
+apply from: 'https://raw.githubusercontent.com/llxdaxia/GradleScript/master/bintray_v1.gradle'

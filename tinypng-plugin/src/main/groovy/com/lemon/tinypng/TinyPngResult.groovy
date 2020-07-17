@@ -1,4 +1,4 @@
-package com.waynell.tinypng
+package com.lemon.tinypng
 
 public class TinyPngResult {
     private long beforeSize

@@ -1,4 +1,4 @@
-package com.waynell.tinypng
+package com.lemon.tinypng
 
 /**
  * Create On 16/12/2016
