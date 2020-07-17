@@ -18,14 +18,12 @@ import java.text.DecimalFormat
  */
 public class TinyPngTask extends DefaultTask {
 
-    def android
     def TinyPngExtension configuration
 
     TinyPngTask() {
         description = 'Tiny Resources'
         group = 'tinypng'
         outputs.upToDateWhen { false }
-        android = project.extensions.android
         configuration = project.tinyInfo
     }
 
@@ -77,7 +75,9 @@ public class TinyPngTask extends DefaultTask {
             }
 
             for (TinyPngInfo info : compressedList) {
-                if (filePath == info.path && generateMD5(file) == info.md5) {
+                // 优化：防止同一个文件被多次重复压缩，去掉 filePath == info.path 的判断
+//                if (filePath == info.path && generateMD5(file) == info.md5) {
+                if (generateMD5(file) == info.md5) {
                     continue label
                 }
             }

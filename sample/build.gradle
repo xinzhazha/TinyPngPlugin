@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+}
+
+version 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'tinypng'
+
+tinyInfo {
+    resourceDir = [
+            // 你的资源目录
+            "$projectDir/src/main/resources",
+            "$projectDir/src/test/resources",
+    ]
+    resourcePattern = [
+            // 你的资源文件夹
+            "drawable[a-z-]*",
+            "mipmap[a-z-]*"
+    ]
+    whiteList = [
+            // 在这里添加文件白名单，支持正则表达式
+    ]
+    apiKey = 'wVwpSc8tM066brCKnZx74dvKpJdc7CZq'
+}
+
+dependencies {
+    compile 'com.tinify:tinify:1.6.2'
+}
